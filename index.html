@@ -266,14 +266,18 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     </div>
     <button class="btn-sm-ghost" onclick="resetAgua()" style="width:100%;margin-bottom:16px;">Resetar hoje</button>
 
-    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;margin-bottom:10px;">Registros de hoje</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;">Registros de hoje</div>
+      <button class="btn-sm-dark" onclick="toggleHistAgua()" id="btn-hist-agua">📅 Histórico</button>
+    </div>
     <div id="agua-hist"></div>
+    <div id="agua-hist-semanal" style="display:none;margin-top:4px;"></div>
   </div>
 </div>
 
 <!-- ═══ PAGE: DIETA ═══ -->
 <div id="page-dieta" class="page">
-  <div class="ph"><div class="ph-brand"><div class="ph-bar" style="background:#44AA44;"></div><div><div class="ph-sub">Nutrição</div><div class="ph-name">Dieta do dia</div></div></div><button class="btn-sm-red" onclick="abrirModalRef()">+ Refeição</button></div>
+  <div class="ph"><div class="ph-brand"><div class="ph-bar" style="background:#44AA44;"></div><div><div class="ph-sub">Nutrição</div><div class="ph-name">Dieta do dia</div></div></div><div style="display:flex;gap:6px;"><button class="btn-sm-dark" onclick="toggleHistDieta()" id="btn-hist-dieta">📅</button><button class="btn-sm-red" onclick="abrirModalRef()">+ Refeição</button></div></div>
 
   <div style="padding:0 16px 16px;">
     <div style="margin-bottom:16px;">
@@ -284,6 +288,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     </div>
   </div>
   <div id="refeicoes-lista"></div>
+  <div id="dieta-hist-semanal" style="display:none;padding:0 16px;margin-top:4px;"></div>
 </div>
 
 <!-- ═══ PAGE: CONFIG ═══ -->
@@ -1139,6 +1144,125 @@ function selecionarExLib(nome){
 // INIT
 // ══════════════════════════════════════════════════════
 renderHome();
+
+// ══════════════════════════════════════════════════════
+// HISTÓRICO SEMANAL — ÁGUA
+// ══════════════════════════════════════════════════════
+let histAguaAberto = false;
+function toggleHistAgua(){
+  histAguaAberto = !histAguaAberto;
+  const div = document.getElementById('agua-hist-semanal');
+  const btn = document.getElementById('btn-hist-agua');
+  if(histAguaAberto){
+    renderHistAgua();
+    div.style.display='block';
+    btn.textContent='✕ Fechar';
+  } else {
+    div.style.display='none';
+    btn.textContent='📅 Histórico';
+  }
+}
+
+function renderHistAgua(){
+  const div = document.getElementById('agua-hist-semanal');
+  const meta = perfil.agua||3000;
+  const dias = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date();
+    d.setDate(d.getDate()-i);
+    const key = d.toISOString().split('T')[0];
+    const data = DB.get('agua_'+key)||{total:0,logs:[]};
+    dias.push({data:key,label:d.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'}),total:data.total,logs:data.logs.length});
+  }
+  const maxTotal = Math.max(...dias.map(d=>d.total),meta);
+  div.innerHTML = `
+    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;margin-bottom:12px;">Últimos 7 dias</div>
+    ${dias.map(d=>{
+      const pct = Math.min(d.total/meta*100,100);
+      const ok = d.total>=meta;
+      return `<div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+          <span style="color:#888;">${d.label}</span>
+          <span style="color:${ok?'#44AA44':'#4466CC'};font-weight:700;">${d.total}ml ${ok?'✓':''}</span>
+        </div>
+        <div style="height:8px;background:#222;border-radius:4px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${ok?'#44AA44':'#4466CC'};border-radius:4px;transition:width .4s;"></div>
+        </div>
+      </div>`;
+    }).join('')}
+    <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid #222;font-size:12px;color:#666;margin-top:4px;">
+      <span>Meta diária: ${meta}ml</span>
+      <span style="color:#44AA44;">${dias.filter(d=>d.total>=meta).length}/7 dias atingidos</span>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// HISTÓRICO SEMANAL — DIETA
+// ══════════════════════════════════════════════════════
+let histDietaAberto = false;
+function toggleHistDieta(){
+  histDietaAberto = !histDietaAberto;
+  const div = document.getElementById('dieta-hist-semanal');
+  const btn = document.getElementById('btn-hist-dieta');
+  if(histDietaAberto){
+    renderHistDieta();
+    div.style.display='block';
+    btn.textContent='✕';
+  } else {
+    div.style.display='none';
+    btn.textContent='📅';
+  }
+}
+
+function renderHistDieta(){
+  const div = document.getElementById('dieta-hist-semanal');
+  const metas = {kcal:perfil.kcal||2500,prot:perfil.prot||200,carb:perfil.carb||250,gord:perfil.gord||70};
+  const dias = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date();
+    d.setDate(d.getDate()-i);
+    const key = d.toISOString().split('T')[0];
+    const data = DB.get('dieta_'+key)||{refeicoes:[]};
+    let totais={kcal:0,prot:0,carb:0,gord:0};
+    data.refeicoes.forEach(r=>r.alimentos.forEach(a=>{totais.kcal+=a.kcal||0;totais.prot+=a.prot||0;totais.carb+=a.carb||0;totais.gord+=a.gord||0;}));
+    dias.push({label:d.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'}),totais,nRef:data.refeicoes.length});
+  }
+  div.innerHTML = `
+    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;margin-bottom:12px;">Últimos 7 dias</div>
+    ${dias.map(d=>{
+      const kcalPct = Math.min(Math.round(d.totais.kcal/metas.kcal*100),100);
+      const protPct = Math.min(Math.round(d.totais.prot/metas.prot*100),100);
+      const carbPct = Math.min(Math.round(d.totais.carb/metas.carb*100),100);
+      const gordPct = Math.min(Math.round(d.totais.gord/metas.gord*100),100);
+      return `<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:700;color:#E8E0D0;">${d.label}</span>
+          <span style="font-size:11px;color:#555;">${d.nRef} refeição(ões) · ${Math.round(d.totais.kcal)}kcal</span>
+        </div>
+        ${d.nRef===0 ? '<div style="font-size:12px;color:#555;text-align:center;">Sem registros</div>' : `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+          <span style="font-size:10px;color:#CC2222;width:56px;">Kcal</span>
+          <div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${kcalPct}%;background:#CC2222;border-radius:3px;"></div></div>
+          <span style="font-size:10px;color:#666;min-width:36px;text-align:right;">${kcalPct}%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+          <span style="font-size:10px;color:#4466CC;width:56px;">Proteína</span>
+          <div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${protPct}%;background:#4466CC;border-radius:3px;"></div></div>
+          <span style="font-size:10px;color:#666;min-width:36px;text-align:right;">${Math.round(d.totais.prot)}g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+          <span style="font-size:10px;color:#EF9F27;width:56px;">Carbo</span>
+          <div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${carbPct}%;background:#EF9F27;border-radius:3px;"></div></div>
+          <span style="font-size:10px;color:#666;min-width:36px;text-align:right;">${Math.round(d.totais.carb)}g</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:10px;color:#44AA44;width:56px;">Gordura</span>
+          <div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${gordPct}%;background:#44AA44;border-radius:3px;"></div></div>
+          <span style="font-size:10px;color:#666;min-width:36px;text-align:right;">${Math.round(d.totais.gord)}g</span>
+        </div>`}
+      </div>`;
+    }).join('')}`;
+}
 </script>
 </body>
 </html>
