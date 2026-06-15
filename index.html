@@ -266,18 +266,14 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     </div>
     <button class="btn-sm-ghost" onclick="resetAgua()" style="width:100%;margin-bottom:16px;">Resetar hoje</button>
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;">Registros de hoje</div>
-      <button class="btn-sm-dark" onclick="toggleHistAgua()" id="btn-hist-agua">📅 Histórico</button>
-    </div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;margin-bottom:10px;">Registros de hoje</div>
     <div id="agua-hist"></div>
-    <div id="agua-hist-semanal" style="display:none;margin-top:4px;"></div>
   </div>
 </div>
 
 <!-- ═══ PAGE: DIETA ═══ -->
 <div id="page-dieta" class="page">
-  <div class="ph"><div class="ph-brand"><div class="ph-bar" style="background:#44AA44;"></div><div><div class="ph-sub">Nutrição</div><div class="ph-name">Dieta do dia</div></div></div><div style="display:flex;gap:6px;"><button class="btn-sm-dark" onclick="toggleHistDieta()" id="btn-hist-dieta">📅</button><button class="btn-sm-red" onclick="abrirModalRef()">+ Refeição</button></div></div>
+  <div class="ph"><div class="ph-brand"><div class="ph-bar" style="background:#44AA44;"></div><div><div class="ph-sub">Nutrição</div><div class="ph-name">Dieta do dia</div></div></div><button class="btn-sm-red" onclick="abrirModalRef()">+ Refeição</button></div>
 
   <div style="padding:0 16px 16px;">
     <div style="margin-bottom:16px;">
@@ -288,7 +284,6 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     </div>
   </div>
   <div id="refeicoes-lista"></div>
-  <div id="dieta-hist-semanal" style="display:none;padding:0 16px;margin-top:4px;"></div>
 </div>
 
 <!-- ═══ PAGE: CONFIG ═══ -->
@@ -476,60 +471,60 @@ let modalCtx={};
 // ══════════════════════════════════════════════════════
 function defaultRotinas(){
   return [
-    {id:'A',nome:'Pull — Costas + Bíceps',dia:'Segunda',tipo:'LOADING',letra:'A',cor:'#4466CC',
+    {id:'A',nome:'Push — Peito + Ombro + Tríceps',dia:'Segunda',tipo:'LOADING',letra:'A',cor:'#CC4444',
      exs:[
-      {n:'Pendlay Row',r:'5 a 9',t:'TOP',o:'Loading set principal'},
-      {n:'Remada articulada uni neutra',r:'5 a 9',t:'TOP',o:'Unilateral'},
-      {n:'Puxada alta pronada',r:'5 a 9',t:'TOP',o:'Cotovelos para baixo'},
-      {n:'Pull Down corda',r:'10 a 12',t:'TOP',o:'Abrir no final'},
-      {n:'Rack Pull',r:'5 a 9',t:'TOP',o:'Espessura de costas'},
-      {n:'Rosca direta barra reta',r:'5 a 9',t:'TOP',o:'Sem balanço'},
-      {n:'Cadeira Flexora',r:'8 a 12',t:'MUSCLE',o:'Muscle Round — falha'},
+      {n:'Close Grip Bench Press Smith',r:'5 a 9',t:'TOP',o:'Pegada fechada no Smith'},
+      {n:'Supino inclinado barra 45°',r:'5 a 9',t:'TOP',o:'Inclinação 45°'},
+      {n:'Desenvolvimento H neutro 70°',r:'5 a 9',t:'TOP',o:'Halter neutro 70°'},
+      {n:'Elevação Lateral 45°',r:'5 a 9',t:'TOP',o:'Inclinação 45°'},
+      {n:'Elevação frontal corda',r:'5 a 9',t:'TOP',o:'Com corda'},
+      {n:'Cross Over polia alta',r:'5 a 9',t:'TOP',o:'Polia alta'},
+      {n:'Crucifixo reverso H sentado',r:'5 a 9',t:'TOP',o:'Halter sentado'},
+      {n:'Tríceps Pulley',r:'5 a 9',t:'TOP',o:''},
+    ]},
+    {id:'B',nome:'Pull — Costas + Bíceps',dia:'Terça',tipo:'LOADING',letra:'B',cor:'#4466CC',
+     exs:[
+      {n:'Seal Row',r:'5 a 9',t:'TOP',o:'Remada peito apoiado'},
+      {n:'Remada aberta máquina',r:'5 a 9',t:'TOP',o:''},
+      {n:'Remada diagonal articulada',r:'5 a 9',t:'TOP',o:'Pronada'},
+      {n:'Puxada alta triângulo',r:'5 a 9',t:'TOP',o:''},
+      {n:'Barra fixa pronada',r:'5 a 9',t:'TOP',o:''},
+      {n:'Face Pull',r:'5 a 9',t:'TOP',o:''},
+      {n:'Rosca Scott máquina',r:'5 a 9',t:'TOP',o:''},
       {n:'DC Stretch Pull Up',r:'2x 1 min',t:'DC',o:'Usar strap'},
     ]},
-    {id:'B',nome:'Push — Peito + Ombro + Tríceps',dia:'Terça',tipo:'LOADING',letra:'B',cor:'#CC4444',
+    {id:'C',nome:'Legs — Pernas',dia:'Quinta',tipo:'LOADING',letra:'C',cor:'#44AA44',
      exs:[
-      {n:'Fly / Voador',r:'5 a 9',t:'TOP',o:'Contração total'},
-      {n:'Supino reto H neutro',r:'5 a 9',t:'TOP',o:'Halter pegada neutra'},
-      {n:'Desenvolvimento H 70°',r:'5 a 9',t:'TOP',o:'Inclinação 70°'},
-      {n:'Cross Over polia baixa',r:'10 a 12',t:'TOP',o:'Polia baixa'},
-      {n:'Crucifixo reverso H',r:'10 a 12',t:'TOP',o:'Posterior do ombro'},
-      {n:'Elevação lateral H sentado',r:'5 a 9',t:'TOP',o:'Sentado'},
-      {n:'Tríceps Frances uni H',r:'5 a 9',t:'TOP',o:'Unilateral'},
-      {n:'Elevação Pélvica máquina',r:'8 a 12',t:'MUSCLE',o:'Muscle Round — falha'},
-      {n:'DC Stretch Bench Press',r:'2x 1 min',t:'DC',o:'Alongamento peito'},
-    ]},
-    {id:'C',nome:'Lower 1 — Pernas',dia:'Quinta',tipo:'LOADING',letra:'C',cor:'#44AA44',
-     exs:[
-      {n:'Cadeira Adutora',r:'5 a 9',t:'TOP',o:'Amplitude total'},
-      {n:'Back Squat',r:'5 a 9',t:'TOP',o:'Joelhos alinhados'},
-      {n:'Hack Linear',r:'5 a 9',t:'TOP',o:'Largura dos ombros'},
-      {n:'Cadeira Extensora uni',r:'5 a 9',t:'TOP',o:'Unilateral'},
-      {n:'Cadeira Flexora',r:'8 a 12',t:'MUSCLE',o:'Muscle Round — falha'},
+      {n:'Cadeira adutora',r:'5 a 9',t:'TOP',o:''},
+      {n:'Elevação Pélvica barra',r:'5 a 9',t:'TOP',o:'DEADSTOP — parar no chão'},
+      {n:'Front Squat',r:'5 a 9',t:'TOP',o:''},
+      {n:'Recuo H',r:'5 a 9',t:'TOP',o:'Halter'},
+      {n:'Mesa Flexora',r:'5 a 9',t:'TOP',o:''},
+      {n:'Flexora Vertical',r:'5 a 9',t:'TOP',o:''},
       {n:'Sóleo banco',r:'5 a 9',t:'TOP',o:'Amplitude total'},
-      {n:'DC Stretch Banco Romano',r:'2x 1 min',t:'DC',o:'Posterior'},
-      {n:'DC Stretch Sissy Quads',r:'2x 1 min',t:'DC',o:'Quadríceps'},
+      {n:'DC Stretch Sissy Quads',r:'2x 1 min',t:'DC',o:''},
     ]},
-    {id:'D',nome:'Upper — Superior',dia:'Sexta',tipo:'MUSCLE',letra:'D',cor:'#9966CC',
+    {id:'D',nome:'Upper — Muscle Round',dia:'Sexta',tipo:'MUSCLE',letra:'D',cor:'#9966CC',
      exs:[
-      {n:'Remada máquina neutra',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
-      {n:'Supino inclinado articulado',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
-      {n:'Puxada alta triângulo',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
-      {n:'Shoulder Press neutro',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
-      {n:'Crucifixo reverso polia',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
-      {n:'Elevação lateral máquina',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Cross Over polia baixa',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Remada baixa triângulo',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Desenvolvimento articulado',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Pull Over corda banco inclinado',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Crucifixo reverso polia média',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Elevação Lateral máquina',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
       {n:'Tríceps Frances corda',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
-      {n:'DC Stretch Pull Up',r:'2x 1 min',t:'DC',o:'Usar strap'},
+      {n:'Rosca Martelo H bilateral',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
     ]},
-    {id:'E',nome:'Lower 2 — Posterior',dia:'Sábado',tipo:'LOADING',letra:'E',cor:'#CC8844',
+    {id:'E',nome:'Lower — Muscle Round',dia:'Sábado',tipo:'MUSCLE',letra:'E',cor:'#CC8844',
      exs:[
-      {n:'Elevação Pélvica máquina',r:'5 a 9',t:'TOP',o:'Contração glúteo'},
-      {n:'Stiff Leg Deadlift',r:'5 a 9',t:'TOP',o:'Coluna neutra'},
-      {n:'Mesa Flexora',r:'5 a 9',t:'TOP',o:'Quadril fixo'},
-      {n:'Cadeira Abdutora 45°',r:'10 a 12',t:'TOP',o:'45 graus'},
-      {n:'Leg Press 45° unilateral',r:'8 a 12',t:'MUSCLE',o:'Muscle Round uni'},
-      {n:'Gêmeos Smith',r:'5 a 9',t:'TOP',o:'Amplitude total'},
-      {n:'DC Stretch Sissy Quads',r:'2x 1 min',t:'DC',o:'Quadríceps'},
+      {n:'Cadeira Abdutora',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Cadeira Adutora',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Leg Press 45°',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Cadeira Extensora',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Stiff Leg Deadlift',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Cadeira Flexora',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'Gêmeos máquina',r:'8 a 12',t:'MUSCLE',o:'Muscle Round'},
+      {n:'DC Stretch DC RDL',r:'2x 1 min',t:'DC',o:''},
     ]},
   ];
 }
@@ -561,7 +556,7 @@ function fecharModal(id){ document.getElementById(id).classList.remove('open'); 
 function renderHome(){
   const d=new Date(), ds=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
   document.getElementById('home-date').textContent=ds[d.getDay()]+' '+d.toLocaleDateString('pt-BR',{day:'numeric',month:'short'});
-  document.getElementById('periodo-txt').textContent='Base (sem 1–2): Warm Up + 1–2 Feeders + 2 Top Sets · Choque (sem 3–6): Warm Up + 1–2 Feeders + 1 Top Set + Rest Pause';
+  document.getElementById('periodo-txt').textContent='Base 1 (sem 1–4): A,B,C → Warm Up + 1–2 Feeders + 2 Top Sets · D,E → Warm Up + 1–2 Feeders + 1 Muscle Round · Base 2 (sem 5–8): A,B,C → acrescenta 1 Back Off Set';
   const ul=document.getElementById('lista-treinos');
   ul.innerHTML='';
   rotinas.forEach(r=>{
@@ -1144,125 +1139,6 @@ function selecionarExLib(nome){
 // INIT
 // ══════════════════════════════════════════════════════
 renderHome();
-
-// ══════════════════════════════════════════════════════
-// HISTÓRICO SEMANAL — ÁGUA
-// ══════════════════════════════════════════════════════
-let histAguaAberto = false;
-function toggleHistAgua(){
-  histAguaAberto = !histAguaAberto;
-  const div = document.getElementById('agua-hist-semanal');
-  const btn = document.getElementById('btn-hist-agua');
-  if(histAguaAberto){
-    renderHistAgua();
-    div.style.display='block';
-    btn.textContent='✕ Fechar';
-  } else {
-    div.style.display='none';
-    btn.textContent='📅 Histórico';
-  }
-}
-
-function renderHistAgua(){
-  const div = document.getElementById('agua-hist-semanal');
-  const meta = perfil.agua||3000;
-  const dias = [];
-  for(let i=6;i>=0;i--){
-    const d = new Date();
-    d.setDate(d.getDate()-i);
-    const key = d.toISOString().split('T')[0];
-    const data = DB.get('agua_'+key)||{total:0,logs:[]};
-    dias.push({data:key,label:d.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'}),total:data.total,logs:data.logs.length});
-  }
-  const maxTotal = Math.max(...dias.map(d=>d.total),meta);
-  div.innerHTML = `
-    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;margin-bottom:12px;">Últimos 7 dias</div>
-    ${dias.map(d=>{
-      const pct = Math.min(d.total/meta*100,100);
-      const ok = d.total>=meta;
-      return `<div style="margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
-          <span style="color:#888;">${d.label}</span>
-          <span style="color:${ok?'#44AA44':'#4466CC'};font-weight:700;">${d.total}ml ${ok?'✓':''}</span>
-        </div>
-        <div style="height:8px;background:#222;border-radius:4px;overflow:hidden;">
-          <div style="height:100%;width:${pct}%;background:${ok?'#44AA44':'#4466CC'};border-radius:4px;transition:width .4s;"></div>
-        </div>
-      </div>`;
-    }).join('')}
-    <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid #222;font-size:12px;color:#666;margin-top:4px;">
-      <span>Meta diária: ${meta}ml</span>
-      <span style="color:#44AA44;">${dias.filter(d=>d.total>=meta).length}/7 dias atingidos</span>
-    </div>`;
-}
-
-// ══════════════════════════════════════════════════════
-// HISTÓRICO SEMANAL — DIETA
-// ══════════════════════════════════════════════════════
-let histDietaAberto = false;
-function toggleHistDieta(){
-  histDietaAberto = !histDietaAberto;
-  const div = document.getElementById('dieta-hist-semanal');
-  const btn = document.getElementById('btn-hist-dieta');
-  if(histDietaAberto){
-    renderHistDieta();
-    div.style.display='block';
-    btn.textContent='✕';
-  } else {
-    div.style.display='none';
-    btn.textContent='📅';
-  }
-}
-
-function renderHistDieta(){
-  const div = document.getElementById('dieta-hist-semanal');
-  const metas = {kcal:perfil.kcal||2500,prot:perfil.prot||200,carb:perfil.carb||250,gord:perfil.gord||70};
-  const dias = [];
-  for(let i=6;i>=0;i--){
-    const d = new Date();
-    d.setDate(d.getDate()-i);
-    const key = d.toISOString().split('T')[0];
-    const data = DB.get('dieta_'+key)||{refeicoes:[]};
-    let totais={kcal:0,prot:0,carb:0,gord:0};
-    data.refeicoes.forEach(r=>r.alimentos.forEach(a=>{totais.kcal+=a.kcal||0;totais.prot+=a.prot||0;totais.carb+=a.carb||0;totais.gord+=a.gord||0;}));
-    dias.push({label:d.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'}),totais,nRef:data.refeicoes.length});
-  }
-  div.innerHTML = `
-    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;margin-bottom:12px;">Últimos 7 dias</div>
-    ${dias.map(d=>{
-      const kcalPct = Math.min(Math.round(d.totais.kcal/metas.kcal*100),100);
-      const protPct = Math.min(Math.round(d.totais.prot/metas.prot*100),100);
-      const carbPct = Math.min(Math.round(d.totais.carb/metas.carb*100),100);
-      const gordPct = Math.min(Math.round(d.totais.gord/metas.gord*100),100);
-      return `<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:12px;margin-bottom:8px;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-          <span style="font-size:13px;font-weight:700;color:#E8E0D0;">${d.label}</span>
-          <span style="font-size:11px;color:#555;">${d.nRef} refeição(ões) · ${Math.round(d.totais.kcal)}kcal</span>
-        </div>
-        ${d.nRef===0 ? '<div style="font-size:12px;color:#555;text-align:center;">Sem registros</div>' : `
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="font-size:10px;color:#CC2222;width:56px;">Kcal</span>
-          <div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${kcalPct}%;background:#CC2222;border-radius:3px;"></div></div>
-          <span style="font-size:10px;color:#666;min-width:36px;text-align:right;">${kcalPct}%</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="font-size:10px;color:#4466CC;width:56px;">Proteína</span>
-          <div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${protPct}%;background:#4466CC;border-radius:3px;"></div></div>
-          <span style="font-size:10px;color:#666;min-width:36px;text-align:right;">${Math.round(d.totais.prot)}g</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <span style="font-size:10px;color:#EF9F27;width:56px;">Carbo</span>
-          <div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${carbPct}%;background:#EF9F27;border-radius:3px;"></div></div>
-          <span style="font-size:10px;color:#666;min-width:36px;text-align:right;">${Math.round(d.totais.carb)}g</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:10px;color:#44AA44;width:56px;">Gordura</span>
-          <div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${gordPct}%;background:#44AA44;border-radius:3px;"></div></div>
-          <span style="font-size:10px;color:#666;min-width:36px;text-align:right;">${Math.round(d.totais.gord)}g</span>
-        </div>`}
-      </div>`;
-    }).join('')}`;
-}
 </script>
 </body>
 </html>
